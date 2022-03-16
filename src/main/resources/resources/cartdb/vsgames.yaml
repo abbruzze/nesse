@@ -1,0 +1,312 @@
+- BattleCity:
+    label: "Battle City"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C04_0001
+    swap_controllers: no
+    zapper: no
+    crc: [0xBFD87C08,0xB2816BF9,0x01357944]
+    dip_switches:
+      - Coinage:
+          label: "Credits for 2 Players"
+          switches: ["1",0x00,"2",0x01]
+          default: 1
+      - Lives:
+          label: "Lives"
+          switches: ["3",0x00,"5",0x02]
+          default: 0
+      - DemoSounds:
+          label: "Demo sounds"
+          switches: ["off",0x00,"on",0x04]
+          default: 0
+      - PPU:
+          label: "PPU"
+          switches: ["2C04_0001",0x00,"2C04_0002",0x40,"2C04_0003",0x80,"2C04_0004",0xC0]
+          default: 0
+- Castlevania:
+    label: "Castlevania"
+    mapper: 2
+    mirroring: VERTICAL
+    ppu: 2C04_0002
+    swap_controllers: no
+    zapper: no
+    crc: [0xBAB3DDB9,0xFFBEF374]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"2 Coin / 1 Credits",0x06,"3 Coin / 1 Credits",0x01,"4 Coins / 1 Credit",0x05,"5 Coins / 1 Credit",0x03,"Free Play",0x07]
+          default: 0
+      - Lives:
+          label: "Lives"
+          switches: ["2",0x08,"3",0x00]
+          default: 1
+      - Bonus:
+          label: "Bonus"
+          switches: ["100k",0x00,"200k",0x20,"300k",0x10,"400k",0x30]
+          default: 0
+      - Difficulty:
+          label: "Difficulty"
+          switches: ["Normal",0x00,"Hard",0x40]
+          default: 0
+- DuckHunt:
+    label: "Duck Hunt"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C03B
+    swap_controllers: no
+    zapper: yes
+    crc: [0xC1D6411F,0xABE1A0C2]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"2 Coin / 1 Credits",0x06,"3 Coin / 1 Credits",0x01,"4 Coins / 1 Credit",0x05,"5 Coins / 1 Credit",0x03,"Free Play",0x07]
+          default: 0
+      - Difficulty:
+          label: "Difficulty"
+          switches: ["Easy",0x00,"Normal",0x08,"Hard",0x10,"Very Hard",0x18]
+          default: 1
+      - MissesPerGame:
+          label: "Misses per game"
+          switches: ["3",0x00,"5",0x20]
+          default: 1
+      - BonusLife:
+          label: "Bonus life"
+          switches: ["30000",0x00,"50000",0x40,"80000",0x80,"100000",0xC0]
+          default: 0
+- Gumshoe:
+    label: "Gumshoe"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C05
+    ppu-status: 0x1C
+    swap_controllers: no
+    zapper: yes
+    crc: [0x0056CC9F,0x07A2F3B2,0x412E5A0D,0x74C78E8C,0x7C7D861A,0xB194CA80]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"2 Coin / 1 Credits",0x06,"3 Coin / 1 Credits",0x01,"4 Coins / 1 Credit",0x05,"5 Coins / 1 Credit",0x03,"Free Play",0x07]
+          default: 0
+      - Difficulty:
+          label: "Difficulty"
+          switches: ["Easy",0x00,"Normal",0x08,"Hard",0x10,"Very hard",0x18]
+          default: 1
+      - Lives:
+          label: "Lives"
+          switches: ["3",0x40,"5",0x00]
+          default: 1
+      - BonusLife:
+          label: "Bonus Life"
+          switches: ["80000",0x00,"100000",0x80]
+          default: 0
+- MightyBombJack:
+      label: "MightyBombJack"
+      mapper: 0
+      mirroring: FOUR_SCREEN
+      ppu: 2C05
+      ppu-status: 0x3D
+      swap_controllers: no
+      zapper: no
+      crc: [0x535E6152]
+      dip_switches:
+          - Coinage:
+                label: "Coinage"
+                switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"1 Coin / 4 Credits",0x06,"2 Coin / 1 Credits",0x01,"3 Coins / 1 Credit",0x05,"4 Coins / 1 Credit",0x03,"5 Coins / 1 Credit",0x07]
+                default: 0
+          - Lives:
+                label: "Lives"
+                switches: ["2",0x10,"3",0x00,"4",0x08,"5",0x18]
+                default: 0
+- Pinball:
+      label: "Pinball"
+      mapper: 99
+      mirroring: VERTICAL
+      ppu: 2C04_0001
+      swap_controllers: no
+      zapper: no
+      crc: [0xCA3E9B1A]
+      dip_switches:
+          - Coinage:
+                label: "Coinage"
+                switches: ["1 Coin / 1 Credit",0x01,"1 Coin / 2 Credits",0x06,"1 Coin / 3 Credits",0x02,"1 Coin / 3 Credit",0x02,"1 Coin / 4 Credits",0x04,"2 Coin / 1 Credits",0x05,"3 Coin / 1 Credits",0x03,"4 Coin / 1 Credits",0x07,"Free play",0x00]
+                default: 0
+          - Balls:
+                label: "Balls"
+                switches: ["2",0x60,"3",0x00,"4",0x40,"5",0x20]
+                default: 1
+          - BallSpeed:
+                label: "Ball speed"
+                switches: ["Normal",0x00,"Fast",0x80]
+                default: 0
+- Platoon:
+    label: "Platoon"
+    mapper: 68
+    mirroring: VERTICAL
+    ppu: 2C04_0001
+    swap_controllers: no
+    zapper: no
+    crc: [0x0A36E7CE,0x31678411,0x2019FE65]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x20,"1 Coin / 3 Credits",0x40,"2 Coin / 1 Credit",0x60,"3 Coin / 1 Credits",0x80,"4 Coin / 1 Credits",0xA0,"5 Coin / 1 Credits",0xC0,"Free Play",0xE0]
+          default: 0
+- RbiBaseball:
+    label: "RbiBaseball"
+    mapper: 206
+    mirroring: VERTICAL
+    ppu: 2C04_0002
+    swap_controllers: yes
+    zapper: no
+    security: rbibaseball
+    crc: [0x252B5E51,0xE45485A5]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x01,"2 Coin / 1 Credits",0x02,"3 Coin / 1 Credits",0x03]
+          default: 0
+      - Max:
+          label: "Max. 1p/in, 2p/in, Min"
+          switches: ["2, 1, 3",0x04,"2, 2, 4",0x0C,"3, 2, 6",0x00,"4, 3, 7",0x08]
+          default: 1
+      - DemoSounds:
+          label: "Demo sounds"
+          switches: [ "Off",0x00,"On",0x10]
+          default: 1
+      - PPU:
+          label: "PPU"
+          switches: ["2C03",0x20,"2C04_0001",0x00,"2C04_0002",0x40,"2C04_0003",0x80,"2C04_0004",0xC0]
+          default: 2
+- Soccer:
+    label: "Soccer"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C04_0003
+    swap_controllers: no
+    zapper: no
+    crc: [0x766C2CAC]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"2 Coin / 1 Credits",0x06,"3 Coin / 1 Credits",0x01,"4 Coins / 1 Credit",0x05,"5 Coins / 1 Credit",0x03,"Free Play",0x07]
+          default: 0
+      - PointsTimer:
+          label: "Points timer"
+          switches: ["600 Pts",0x00,"800 Pts",0x10,"1000 Pts",0x08,"1200 Pts",0x18]
+          default: 2
+      - Difficulty:
+          label: "Difficulty"
+          switches: [ "Easy",0x00,"Normal",0x40,"Hard",0x20,"Very hard",0x60]
+          default: 1
+- SuperMarioBros:
+    label: "Super Mario Bros"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C04_0004
+    swap_controllers: no
+    zapper: no
+    crc: [0x7CFF0F84,0x1C7430F9,0x4B79ED83,0x4BF3972D,0x98E3C75A]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x06,"1 Coin / 3 Credits",0x01,"1 Coin / 4 Credits",0x05,"1 Coin / 5 Credits",0x03,"2 Coins / 1 Credit",0x04,"3 Coins / 1 Credit",0x02,"Free Play",0x07]
+          default: 0
+      - Lives:
+          label: "Lives"
+          switches: ["2",0x08,"3",0x00]
+          default: 1
+      - BonusLife:
+          label: "Bonus Life"
+          switches: ["100",0x00,"150",0x20,"200",0x10,"250",0x30]
+          default: 0
+      - Timer:
+          label: "Timer"
+          switches: ["Normal",0x00,"Fast",0x40]
+          default: 0
+      - ContinueLives:
+          label: "Continue Lives"
+          switches: ["3",0x80,"4",0x00]
+          default: 0
+- SuperXevious:
+    label: "Super Xevious"
+    mapper: 206
+    mirroring: HORIZONTAL
+    ppu: 2C04_0002
+    swap_controllers: no
+    zapper: no
+    security: superxevious
+    crc: [0xDF07C203,0x89B56859,0x12012CD9]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x10,"2 Coin / 1 Credits",0x20,"3 Coin / 1 Credits",0x30]
+          default: 0
+      - PPU:
+          label: "PPU"
+          switches: ["2C04_0001",0x00,"2C04_0002",0x40,"2C04_0003",0x80,"2C04_0004",0xC0]
+          default: 1
+- Tetris:
+    label: "Tetris"
+    mapper: 99
+    mirroring: FOUR_SCREEN
+    ppu: 2C04_0002
+    swap_controllers: yes
+    zapper: no
+    crc: [0x6B6F2442,0xAECA9D42,0xC492B4D1,0xE9A6F17D]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x02,"2 Coin / 1 Credits",0x01,"3 Coin / 1 Credits",0x03]
+          default: 0
+      - PaletteColor:
+          label: "Palette color"
+          switches: ["Black",0x40,"Green",0x20,"Grey",0x60]
+          default: 0
+- TKOBoxing:
+    label: "Tko boxing"
+    mapper: 206
+    mirroring: VERTICAL
+    ppu: 2C03B
+    swap_controllers: no
+    zapper: no
+    security: tkoboxing
+    crc: [0x52C501D0,0x8764C6FA]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x01,"2 Coin / 1 Credits",0x02,"3 Coin / 1 Credits",0x03]
+          default: 0
+      - Palette:
+          label: "Palette color"
+          switches: ["Black",0x00,"White",0x20]
+          default: 1
+- Topgun:
+    label: "Top gun"
+    mapper: 2
+    mirroring: HORIZONTAL
+    ppu: 2C05
+    ppu-status: 0x1B
+    swap_controllers: no
+    zapper: no
+    crc: [0x8C0C2DF5]
+    dip_switches:
+      - Coinage:
+          label: "Coinage"
+          switches: ["1 Coin / 1 Credit",0x00,"1 Coin / 2 Credits",0x04,"1 Coin / 3 Credits",0x02,"2 Coin / 1 Credits",0x06,"3 Coin / 1 Credits",0x01,"4 Coins / 1 Credit",0x05,"5 Coins / 1 Credit",0x03,"Free Play",0x07]
+          default: 0
+      - LivesPerCoin:
+          label: "Lives per coin"
+          switches: ["3 - 12 Max",0x00,"2 - 9 Max",0x08]
+          default: 0
+      - Bonus:
+          label: "Bonus"
+          switches: ["30k and every 50k",0x00,"50k and every 100k",0x20,"100k and every 150k",0x10,"200k and every 200k",0x30]
+          default: 0
+      - Difficulty:
+          label: "Difficulty"
+          switches: ["Normal",0x00,"Hard",0x40]
+          default: 0
+      - DemoSounds:
+          label: "Demo sounds"
+          switches: [ "off",0x00,"on",0x80]
+          default: 0
