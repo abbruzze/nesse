@@ -3,6 +3,8 @@ package ucesoft.nes.mappers
 import ucesoft.nes.cpu.CPU6502
 import ucesoft.nes.{Cartridge, PPU}
 
+import java.io.{ObjectInputStream, ObjectOutputStream}
+
 class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) extends Cartridge(ppu,ines,irqHandler):
   override val cartName : String = "MMC5"
   override val listenToAllAddresses = true
@@ -34,6 +36,7 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
   private val ramProtect = Array(0,0)
   private var prgRAMWriteable = false
   private val dummyFillNT = Array.ofDim[Int](0)
+  private var mirroringMode = 0
   // TIMER
   private var timerRunning = false
   private var timerCounter = 0
@@ -59,36 +62,43 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
   private var verticalOffset = 0
   private var verticalSplitBank = 0
   private var verticalSplitCHRRead = false
-  /*
-  private var matchCount = 0
-  private var idleCount = 0
-  private var ppuIsReading = false
-  private var lastAddress = -1
-  */
 
   // Constructor
   customNTHandling = true
   initBanks()
 
   private def initBanks(): Unit =
-    prgMode = 3
-    chrMode = 0
-    var b = 0
     java.util.Arrays.fill(prgRegs,0x7F)
+    java.util.Arrays.fill(chrRegs,0)
+    java.util.Arrays.fill(exRAM,0)
+    java.util.Arrays.fill(ramProtect,0)
     java.util.Arrays.fill(romFlag,true)
-    /*
-    val bank8K = (ROM.length << 1) - 1
-    while b < prgRegs.length do
-      prgRegs(b) = 0x7F //bank8K
-      romFlag(b) = true
-      b += 1
-    */
 
   override def reset: Unit =
     super.reset
     initBanks()
 
-  override protected def initStaticRam() : Array[Int] = Array.ofDim[Int](0x40000)
+    prgMode = 3
+    chrMode = 0
+    exRAMMode = 0
+    prgRAMWriteable = false
+    timerRunning = false
+    timerCounter = 0
+    timerIRQFlag = false
+    mulOp1 = 0xFF
+    mulOp2 = 0xFF
+    sprite8x8 = false
+    renderingEnabled = false
+    spriteMode = false
+    irqScanline = 0
+    irqEnabled = false
+    inFrame = false
+    scanLineIRQPending = false
+    scanline = 0
+    verticalSplitEnabled = false
+    verticalSplitScroll = 0
+
+  override protected def initStaticRam() : Array[Int] = Array.ofDim[Int](0x10000)
 
   // ========================= Scanline Detection and Scanline IRQ ===========================
 
@@ -127,16 +137,6 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
         case _ =>
 
   override def cpuClock(): Unit =
-    /*
-    if ppuIsReading then
-      idleCount = 0
-    else
-      idleCount += 1
-      if idleCount == 3 then
-        inFrame = false
-        lastAddress = -1
-    ppuIsReading = false
-    */
     if timerRunning then
       timerCounter = (timerCounter - 1) & 0xFFFF
       if timerCounter == 0 then
@@ -145,15 +145,6 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
         checkIRQ()
 
   override protected def readCPU(address:Int) : Int =
-    /*
-    if address == 0xFFFA || address == 0xFFFB then
-      inFrame = false
-      scanline = 0
-      scanLineIRQPending = false
-      checkIRQ()
-      lastAddress = -1
-    */
-
     if address >= 0x5000 then
       if address < 0x5C00 then
         openbus = readRegisters(address)
@@ -171,7 +162,6 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
       case 0x2001 =>
         if (value & 0x18) == 0 then
           inFrame = false
-          //lastAddress = -1
           renderingEnabled = false
         else
           renderingEnabled = true
@@ -183,35 +173,6 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
             writeEXRAM(address,value)
           else
             write(address,value)
-
-/*
-  override protected def readPPU(address: Int, readOnly: Boolean): Int =
-    if address >= 0x2000 && address <= 0x2FFF && address == lastAddress then
-        matchCount += 1
-        if matchCount == 2 then
-          if !inFrame then
-            inFrame = true
-            scanline = 0
-            scanLineIRQPending = false
-            checkIRQ()
-          else
-            scanline += 1
-            if scanline == irqScanline then
-              scanLineIRQPending = true
-              checkIRQ()
-            if scanline == 240 then
-              inFrame = false
-              scanline = 0
-              scanLineIRQPending = false
-              checkIRQ()
-    else
-      matchCount = 0
-
-    lastAddress = address
-    ppuIsReading = true
-
-    super.readPPU(address, readOnly)
-*/
 
   // =========================================================================================
 
@@ -310,6 +271,7 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
       timerCounter = (timerCounter & 0x00FF) | (value << 8)
 
   private def setMirroringMode(_value:Int): Unit =
+    mirroringMode = _value
     var value = _value
     var c = 0
     while c < 4 do
@@ -523,37 +485,85 @@ class Mapper_005(ppu : PPU, ines:Cartridge.iNES, irqHandler: Boolean => Unit) ex
       case 3 =>
         readCHR_1K(address,chrRegs(8 + ((address & 0xFFF) >> 10)) | chrHiReg)
 
-  /*
-  override protected def writeCHR(address:Int,value:Int) : Unit =
-    if sprite8x8 then
-      writeCHR8x8(address,value)
-    else if spriteMode then
-      readCHR8x8(address)
-    else
-      writeCHR8x16(address,value)
+  override def saveState(out: ObjectOutputStream): Unit =
+    out.writeInt(prgMode)
+    out.writeInt(chrMode)
+    out.writeObject(prgRegs)
+    out.writeObject(chrRegs)
+    out.writeBoolean(lastWriteChrRegsLower)
+    out.writeInt(chrHiReg)
+    out.writeObject(exRAM)
+    out.writeInt(exRAMMode)
+    out.writeInt(exRAMLastNTAddress)
+    out.writeInt(exRAMBlock)
+    out.writeObject(ntMapping)
+    out.writeInt(fillModeTile)
+    out.writeInt(fillModeColor)
+    out.writeObject(romFlag)
+    out.writeObject(ramProtect)
+    out.writeBoolean(prgRAMWriteable)
+    out.writeBoolean(timerRunning)
+    out.writeInt(timerCounter)
+    out.writeBoolean(timerIRQFlag)
+    out.writeInt(mulOp1)
+    out.writeInt(mulOp2)
+    out.writeBoolean(sprite8x8)
+    out.writeBoolean(renderingEnabled)
+    out.writeBoolean(spriteMode)
+    out.writeInt(irqScanline)
+    out.writeBoolean(irqEnabled)
+    out.writeBoolean(inFrame)
+    out.writeBoolean(scanLineIRQPending)
+    out.writeInt(scanline)
+    out.writeInt(ppuCycle)
+    out.writeBoolean(verticalSplitEnabled)
+    out.writeInt(verticalSplitXTile)
+    out.writeBoolean(verticalSplitRight)
+    out.writeInt(verticalSplitScroll)
+    out.writeInt(verticalOffset)
+    out.writeInt(verticalSplitBank)
+    out.writeBoolean(verticalSplitCHRRead)
+    out.writeInt(mirroringMode)
+    super.saveState(out)
 
-  inline private def writeCHR8x8(address:Int,value:Int): Unit =
-    chrMode match
-      case 0 =>
-        CHR(chrRegs(_0000_1FFF) | chrHiReg)(address & 0x1FFF) = value
-      case 1 =>
-        writeCHR_4K(address,chrRegs(3 + ((address >> 12) << 2)),value)
-      case 2 =>
-        writeCHR_2K(address,chrRegs(1 + ((address >> 11) << 1)) | chrHiReg,value)
-      case 3 =>
-        writeCHR_1K(address,chrRegs(address >> 10) | chrHiReg,value)
-
-  inline private def writeCHR8x16(address:Int,value:Int): Unit =
-    chrMode match
-      case 0 =>
-        CHR(chrRegs(11))(address & 0x1FFF) = value
-      case 1 =>
-        writeCHR_4K(address,chrRegs(11),value)
-      case 2 =>
-        if (address & 0x0FFF) < 0x800 then
-          writeCHR_2K(address,chrRegs(9) | chrHiReg,value)
-        else
-          writeCHR_2K(address,chrRegs(11) | chrHiReg,value)
-      case 3 =>
-        writeCHR_1K(address,chrRegs(8 + ((address & 0xFFF) >> 10)) | chrHiReg,value)
-  */
+  override def loadState(in: ObjectInputStream): Unit =
+    prgMode = in.readInt()
+    chrMode = in.readInt()
+    loadMemory(prgRegs,in)
+    loadMemory(chrRegs,in)
+    lastWriteChrRegsLower = in.readBoolean()
+    chrHiReg = in.readInt()
+    loadMemory(exRAM,in)
+    exRAMMode = in.readInt()
+    exRAMLastNTAddress = in.readInt()
+    exRAMBlock = in.readInt()
+    loadMemory(ntMapping,in)
+    fillModeTile = in.readInt()
+    fillModeColor = in.readInt()
+    loadMemory(romFlag,in)
+    loadMemory(ramProtect,in)
+    prgRAMWriteable = in.readBoolean()
+    timerRunning = in.readBoolean()
+    timerCounter = in.readInt()
+    timerIRQFlag = in.readBoolean()
+    mulOp1 = in.readInt()
+    mulOp2 = in.readInt()
+    sprite8x8 = in.readBoolean()
+    renderingEnabled = in.readBoolean()
+    spriteMode = in.readBoolean()
+    irqScanline = in.readInt()
+    irqEnabled = in.readBoolean()
+    inFrame = in.readBoolean()
+    scanLineIRQPending = in.readBoolean()
+    scanline = in.readInt()
+    ppuCycle = in.readInt()
+    verticalSplitEnabled = in.readBoolean()
+    verticalSplitXTile = in.readInt()
+    verticalSplitRight = in.readBoolean()
+    verticalSplitScroll = in.readInt()
+    verticalOffset = in.readInt()
+    verticalSplitBank = in.readInt()
+    verticalSplitCHRRead = in.readBoolean()
+    mirroringMode = in.readInt()
+    setMirroringMode(mirroringMode)
+    super.loadState(in)

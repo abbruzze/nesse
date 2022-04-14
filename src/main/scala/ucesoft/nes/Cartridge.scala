@@ -242,7 +242,7 @@ abstract class Cartridge(protected val ppu : PPU,val ines:Cartridge.iNES,protect
   def chrBankSize: Int = CHR.length
 
   protected def checkPRGRom(rom:Array[Array[Int]]): Array[Array[Int]] =
-    if rom.length > 1 then
+    if rom.length > 1 || rom.length == 0 then
       rom
     else
       val prg = Array.ofDim[Int](2,16384)

@@ -25,6 +25,7 @@ object Preferences {
   val PPU_PALETTE_FILE = "palette-file"
   // FDS ==========================================================
   val FDS_ROM_BIOS = "fds-bios-path"
+  val FDS_DISK_SCROLL_LOCK_ENABLED = "fds-disk-on-scroll-lock"
   
   class PreferenceIllegalArgumentException(msg:String) extends Exception(msg)
 

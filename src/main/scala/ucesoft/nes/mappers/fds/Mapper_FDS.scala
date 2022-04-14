@@ -121,17 +121,18 @@ class Mapper_FDS(bios:Array[Int],ppu : PPU,irqHandler: Boolean => Unit) extends 
     ledON = false
 
   inline private def setLedOn(on:Boolean): Unit =
-    if on then
-      ledCounter = LED_DELAY
-    if on != ledON then
-      ledON = on
-      SwingUtilities.invokeLater(() => {
-        robot.keyPress(KeyEvent.VK_SCROLL_LOCK)
-        robot.keyRelease(KeyEvent.VK_SCROLL_LOCK)
-        if !on then
+    if FDS.isScrollLockEnabledAsDiskAccess then
+      if on then
+        ledCounter = LED_DELAY
+      if on != ledON then
+        ledON = on
+        SwingUtilities.invokeLater(() => {
           robot.keyPress(KeyEvent.VK_SCROLL_LOCK)
           robot.keyRelease(KeyEvent.VK_SCROLL_LOCK)
-      })
+          if !on then
+            robot.keyPress(KeyEvent.VK_SCROLL_LOCK)
+            robot.keyRelease(KeyEvent.VK_SCROLL_LOCK)
+        })
 
   override def getAudioSample(): Double = audio.getAudioSample()
   override def getAudioRatio(): Double = 0.60

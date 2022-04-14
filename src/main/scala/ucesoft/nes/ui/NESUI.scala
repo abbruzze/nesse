@@ -289,6 +289,9 @@ class NESUI extends SwingAware with VideoControl:
         throw new IllegalArgumentException("FDS ROM bios path not valid")
       FDS.setBiosROMFile(path)
     }
+    pref.add(FDS_DISK_SCROLL_LOCK_ENABLED,s"disk access turn on/off scroll lock key",false) { scrollLockEnabled =>
+      FDS.enableScrollLockAsDiskAccess(scrollLockEnabled)
+    }
     // Cheats
     pref.add(CHEATS,s"configure a list of plus sign separated Game Genie's cheat codes","") { cheats =>
       nes.cpuMem.removeAllCheats()
@@ -840,6 +843,7 @@ class NESUI extends SwingAware with VideoControl:
       vsSwitches = vsgame.switches
 
   protected def saveState(overwrite:Boolean): Unit =
+    paused = true
     pause()
     var out : ObjectOutputStream = null
     try
@@ -864,6 +868,7 @@ class NESUI extends SwingAware with VideoControl:
         t.printStackTrace()
     finally
       if out != null then out.close
+      paused = false
       play()
 
   protected def loadState(reload:Boolean): Unit =

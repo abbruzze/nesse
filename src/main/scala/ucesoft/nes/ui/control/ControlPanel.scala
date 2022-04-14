@@ -104,12 +104,7 @@ class ControlPanel(frame:JFrame,nes:NES,videoControl:VideoControl) extends JPane
 
     cardPanel.add(new JoystickMasterPanel(nes),"Joystick")
     cardPanel.add(new KeyboardPanel(frame,nes),"Family Keyboard")
-    /*
-    cardPanel.add(new ModelPanel(spectrum.preferences),"Model")
-    cardPanel.add(new VideoPanel(spectrum,videoControl),"Video")
-    cardPanel.add(new TapePanel(spectrum),"Tape")
-    cardPanel.add(new AudioPanel(spectrum),"Audio")
-    */
+    cardPanel.add(new FDSPanel(nes),"FDS")
 
     cardPanel.getLayout.asInstanceOf[CardLayout].show(cardPanel,"Joystick")
   }

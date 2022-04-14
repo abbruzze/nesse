@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 object FDS:
   private inline val SIDE_SIZE = 65500
   private var biosROM : Array[Int] = _
+  private var diskAccessOnScrollLockEnabled = false
 
   def FDS_INES() = Cartridge.iNES(0L,
     "",
@@ -48,6 +49,11 @@ object FDS:
   def isBIOSConfigured(): Boolean = biosROM != null
 
   def getBiosROM(): Array[Int] = biosROM
+  
+  def enableScrollLockAsDiskAccess(enabled:Boolean): Unit =
+    diskAccessOnScrollLockEnabled = enabled
+    
+  def isScrollLockEnabledAsDiskAccess : Boolean = diskAccessOnScrollLockEnabled
 
   def setBiosROMFile(file:String) : Unit =
     val f = new File(file)
