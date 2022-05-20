@@ -188,7 +188,7 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
 
   // Display Cache
   private[this] var minModX,maxModX,minModY,maxModY = 0
-  private[this] var pixelMod = false
+  private[this] var pixelMod,repaintWholeScreen = false
 
   // Scanline effect
   private[this] var applyScanLineEffect = false
@@ -224,6 +224,7 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
 
   def enableScanlineEffect(enabled:Boolean): Unit =
     applyScanLineEffect = enabled
+    repaintWholeScreen = true
   
   def setOpticalDevice(optical:InputDevice): Unit = this.optical = optical
   
@@ -236,11 +237,14 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
     else
       overscan = DEFAULT_OVERSCAN
 
+  def setRegion(region:Cartridge.TV): Unit =
+    LAST_VBLANK_LINE = region.totalScanLines - 2
+    if !ignoreOverscan then
+      overscan = region.overScan
+
   def setCartridge(cart:Cartridge) : Unit =
     cartridge = cart
-    LAST_VBLANK_LINE = cart.ines.tv.totalScanLines - 2
-    if !ignoreOverscan then
-      overscan = cart.ines.tv.overScan
+    setRegion(cart.ines.tv)
 
     cart.ines.game match
       case Some(game) =>
@@ -620,7 +624,7 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
         if ((cycle - 1) & 1) == 0 then secondOAM((cycle - 1) >> 1) = 0xFF
 
       //if !preRenderLine && cycle == 257 then evaluateSprite()
-      if !preRenderLine then evalSprite2()
+      if !preRenderLine then evalSprite()
 
       if /*!preRenderLine &&*/ cycle > 256 && cycle < 321 && displayON then
         // OAMADDR is set to 0 during each of ticks 257-320 (the sprite tile loading interval) of the pre-render and visible scanlines.
@@ -701,6 +705,7 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
       //if y == 0xFF then shifterSpriteHi(sprite) = 0 // discard if sprite is not visible
   }
 
+  /* OLD implementation
   inline private def evaluateSprite() : Unit = {
     var oamPtr = oamAddress
     var spriteCount = 0
@@ -723,9 +728,9 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
 
     spriteOverflowFlag = spriteCount > 8
   }
+  */
 
-
-  inline private def evalSprite2(): Unit =
+  inline private def evalSprite(): Unit =
     if cycle >= 65 && cycle < 257 then
       if cycle == 65 then
         oamPtr = oamAddress
@@ -882,10 +887,11 @@ class PPU(nmiHandler:() => Unit) extends NESComponent with Memory {
     //display.showFrame(0,0,DISPLAY_WIDTH,DISPLAY_HEIGHT)
     if frameListener != null then frameListener()
 
-    if pixelMod then
+    if pixelMod && !repaintWholeScreen then
       display.showFrame(minModX,minModY,maxModX + 1,maxModY + 1)
     else
       display.showFrame(-1,0,0,0)
+      repaintWholeScreen = false
 
     minModY = -1
     minModX = Integer.MAX_VALUE

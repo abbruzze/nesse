@@ -3,7 +3,7 @@ name := "NESSE"
 
 version := "1.0"
 
-scalaVersion := "3.1.0"
+scalaVersion := "3.1.2"
 
 scalacOptions ++= Seq(
   "-language:postfixOps",

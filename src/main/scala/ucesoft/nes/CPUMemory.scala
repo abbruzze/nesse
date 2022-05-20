@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 class CPUMemory(startDMA:Int => Unit,
                 ppuMem:Memory,
                 apuMem:Memory,
-                inputManager:InputDevice) extends NESComponent with Memory {
+                inputManager:InputDevice) extends NESComponent with Memory with Cheat.CheatManager {
   override val name: String = "CPUMemory"
   override val componentID: String = "CPUMemory"
   override val componentType: NESComponentType = NESComponentType.MEMORY
@@ -26,19 +26,19 @@ class CPUMemory(startDMA:Int => Unit,
     this.cart = cart
     cartListenToAllAddresses = cart.listenToAllAddresses
 
-  def addCheat(cheat:Cheat.Cheat): Unit =
+  override def addCheat(cheat:Cheat.Cheat): Unit =
     cheatAddress(cheat.address - 0x8000) = cheat
     cheatList += cheat
 
-  def removeCheat(cheat:Cheat.Cheat): Unit =
+  override def removeCheat(cheat:Cheat.Cheat): Unit =
     cheatAddress(cheat.address - 0x8000) = null
     cheatList -= cheat
 
-  def removeAllCheats(): Unit =
+  override def removeAllCheats(): Unit =
     for a <- cheatAddress.indices do cheatAddress(a) = null
     cheatList.clear()
-    
-  def getCheats(): List[Cheat.Cheat] = cheatList.toList
+
+  override def getCheats(): List[Cheat.Cheat] = cheatList.toList
 
   override def reset: Unit = {}
 

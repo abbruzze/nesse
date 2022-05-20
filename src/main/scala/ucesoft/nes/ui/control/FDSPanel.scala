@@ -7,6 +7,7 @@ import ucesoft.nes.misc.Preferences
 import ucesoft.nes.mappers.fds.FDS
 
 import java.awt.{BorderLayout, FlowLayout}
+import java.io.File
 import javax.swing.*
 
 class FDSPanel(nes:NES) extends JPanel:
@@ -53,6 +54,10 @@ class FDSPanel(nes:NES) extends JPanel:
 
   private def selectROM(): Unit =
     val fc = new JFileChooser
+    if !romFile.getText.isEmpty then
+      val parent = new File(romFile.getText)
+      if parent.getParentFile != null then
+        fc.setCurrentDirectory(parent.getParentFile)
     fc.showOpenDialog(this) match {
       case JFileChooser.APPROVE_OPTION =>
         try

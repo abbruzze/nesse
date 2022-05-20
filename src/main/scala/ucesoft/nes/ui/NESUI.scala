@@ -61,7 +61,10 @@ class NESUI extends SwingAware with VideoControl:
   protected var deviceMenuItem : JMenu = _
   protected var diskMenuItem : JMenu = _
   protected var changeDiskItem,ejectDiskItem : JMenuItem = _
+  protected var cheatsItem : JMenuItem = _
   protected var vsMenu : JMenu = _
+
+  protected var cheatsFromCommandLine : List[Cheat.Cheat] = Nil
 
   protected var controlPanelDialog : JDialog = _
 
@@ -194,6 +197,7 @@ class NESUI extends SwingAware with VideoControl:
       display.repaint()
       frame.setTitle(s"NESSE v${Version.VERSION} ")
       snapshotMode.setEnabled(false)
+      cheatsItem.setEnabled(false)
       nameTableViewerItem.setEnabled(false)
       tileViewerItem.setEnabled(false)
       stateSnapShotManager.clear()
@@ -262,8 +266,17 @@ class NESUI extends SwingAware with VideoControl:
     import Cartridge.TV
     pref.add(PPU_TV_MODE,s"sets PPU region","auto",TV.values.map(_.toString).toSet + "auto") { region =>
       tvMode = region match
-        case "auto" => None
-        case r => Some(Cartridge.TV.valueOf(r))
+        case "auto" =>
+          nes.getCartridge() match {
+            case Some(cart) =>
+              nes.ppu.setRegion(cart.ines.tv)
+            case None =>
+          }
+          None
+        case r =>
+          val region = Cartridge.TV.valueOf(r.toUpperCase())
+          nes.ppu.setRegion(region)
+          Some(region)
     }
     pref.add(PPU_SCANLINE_EFFECT,s"enable/disable scanline effect",false) { crtEnabled =>
       nes.ppu.enableScanlineEffect(crtEnabled)
@@ -294,13 +307,14 @@ class NESUI extends SwingAware with VideoControl:
     }
     // Cheats
     pref.add(CHEATS,s"configure a list of plus sign separated Game Genie's cheat codes","") { cheats =>
-      nes.cpuMem.removeAllCheats()
+      val cl = new ListBuffer[Cheat.Cheat]
       for c <- cheats.split("\\+") do
         Cheat.gameGenieDecode(c.trim) match
           case Some(cheat) =>
-            nes.cpuMem.addCheat(cheat)
+            cl += cheat
           case None =>
             println(s"Invalid cheat code $c")
+      cheatsFromCommandLine = cl.toList
     }
     // Focus
     pref.add(PAUSE_IF_LOST_FOCUS,s"pauses emulation on focus lost",true) { pauseIfFocusLost => }
@@ -345,7 +359,6 @@ class NESUI extends SwingAware with VideoControl:
       }
       frame.setVisible(true)
     }
-    println(s"Coverage: ${ucesoft.nes.util.CartDB.coverage}")
   }
 
   protected def buildMenu() : Unit =
@@ -500,6 +513,7 @@ class NESUI extends SwingAware with VideoControl:
     val snapshotViewerItem = new JMenuItem("Snapshot viewer ...")
     snapshotViewerItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V,java.awt.event.InputEvent.ALT_DOWN_MASK))
     snapshotMode = new JCheckBoxMenuItem("Snapshot mode")
+    snapshotMode.setEnabled(false)
     snapshotMode.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N,java.awt.event.InputEvent.ALT_DOWN_MASK))
     snapshotMode.addActionListener(_ => {
       if snapshotMode.isSelected then
@@ -514,6 +528,11 @@ class NESUI extends SwingAware with VideoControl:
     warpModeItem.setSelected(nes.clk.maximumSpeed)
     warpModeItem.addActionListener(_ => setWarpMode(warpModeItem.isSelected) )
     optionMenu.add(warpModeItem)
+
+    cheatsItem = new JMenuItem("Cheats ...")
+    cheatsItem.setEnabled(false)
+    cheatsItem.addActionListener(_ => openCheatsDialog())
+    optionMenu.add(cheatsItem)
 
     val fullScreenItem = new JMenuItem("Full screen ...")
     fullScreenItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER,java.awt.event.InputEvent.ALT_DOWN_MASK))
@@ -617,7 +636,13 @@ class NESUI extends SwingAware with VideoControl:
           })
         case _ =>
 
-  private def takeSnapshot()  : Unit = {
+  private def openCheatsDialog(): Unit =
+    val cheatPanel = new CheatPanel(frame,nes.cpuMem,nes.getCartridge().flatMap(_.ines.game).map(_.name),nes.preferences)
+    cheatPanel.dialog.setVisible(true)
+    if cheatPanel.isApplied then
+      reset(true)
+
+  private def takeSnapshot()  : Unit =
     val fc = new JFileChooser
     fc.showSaveDialog(frame) match {
       case JFileChooser.APPROVE_OPTION =>
@@ -625,7 +650,6 @@ class NESUI extends SwingAware with VideoControl:
         display.saveSnapshot(file)
       case _ =>
     }
-  }
 
   protected def setWarpMode(on:Boolean) : Unit =
     nes.audioDevice.mute(on)
@@ -832,6 +856,7 @@ class NESUI extends SwingAware with VideoControl:
     checkDeviceMenu(devices)
     display.notifyDisplaySizeChange()
     snapshotMode.setEnabled(true)
+    cheatsItem.setEnabled(true)
     nameTableViewerItem.setEnabled(true)
     tileViewerItem.setEnabled(true)
     traceDialog.cart = nes.getCartridge().get
@@ -841,6 +866,10 @@ class NESUI extends SwingAware with VideoControl:
     for game <- ines.game ; vsgame <- game.vsGame do
       vsMenu.setVisible(true)
       vsSwitches = vsgame.switches
+    // reset cheats
+    nes.cpuMem.removeAllCheats()
+    for c <- cheatsFromCommandLine do
+      nes.cpuMem.addCheat(c)
 
   protected def saveState(overwrite:Boolean): Unit =
     paused = true

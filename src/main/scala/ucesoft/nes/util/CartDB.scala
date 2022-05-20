@@ -2,16 +2,17 @@ package ucesoft.nes.util
 
 import org.w3c.dom.{Element, Node}
 import org.yaml.snakeyaml.Yaml
-import ucesoft.nes.{Cartridge, PPU}
 import ucesoft.nes.controller.InputType
 import ucesoft.nes.mappers.MapperFactory
-import scala.jdk.CollectionConverters.*
-import java.util.{List as JList, Map as JMap}
+import ucesoft.nes.{Cartridge, PPU}
+
 import java.io.{BufferedInputStream, DataInputStream, EOFException, FileInputStream}
 import java.util.zip.GZIPInputStream
+import java.util.{List as JList, Map as JMap}
 import javax.xml.parsers.DocumentBuilderFactory
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters.*
 
 object CartDB:
   case class Game(name:String,

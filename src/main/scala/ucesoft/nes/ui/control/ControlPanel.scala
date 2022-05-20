@@ -5,9 +5,9 @@ import ucesoft.nes.NES
 import ucesoft.nes.misc.Preferences
 
 import java.awt.{BorderLayout, CardLayout, Color, FlowLayout}
-import javax.swing.event.{TreeExpansionEvent, TreeSelectionEvent, TreeSelectionListener, TreeWillExpandListener}
-import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeCellRenderer, ExpandVetoException, TreeSelectionModel}
 import javax.swing.*
+import javax.swing.event.{TreeExpansionEvent, TreeSelectionEvent, TreeSelectionListener, TreeWillExpandListener}
+import javax.swing.tree.*
 import scala.annotation.tailrec
 
 object ControlPanel {
@@ -50,7 +50,8 @@ class ControlPanel(frame:JFrame,nes:NES,videoControl:VideoControl) extends JPane
     // general
     val general = new DefaultMutableTreeNode("General")
     // general -> model
-    general.add(new DefaultMutableTreeNode("Model"))
+    val model = new DefaultMutableTreeNode("Model")
+    general.add(model)
     root.add(general)
     // joystick
     val joy = new DefaultMutableTreeNode("Joystick")
@@ -61,20 +62,14 @@ class ControlPanel(frame:JFrame,nes:NES,videoControl:VideoControl) extends JPane
     // Video
     val video = new DefaultMutableTreeNode("Video")
     root.add(video)
-    // Tape
-    val tape = new DefaultMutableTreeNode("Tape")
-    root.add(tape)
-    // Audio
-    val audio = new DefaultMutableTreeNode("Audio")
-    root.add(audio)
     // Peripherals
     val fds = new DefaultMutableTreeNode("FDS")
     root.add(fds)
 
-
     val treeView = new JScrollPane(tree)
 
     expandTree(tree)
+    tree.setSelectionRow(2)
 
     setLayout(new BorderLayout())
     add("West",treeView)
@@ -105,8 +100,10 @@ class ControlPanel(frame:JFrame,nes:NES,videoControl:VideoControl) extends JPane
     cardPanel.add(new JoystickMasterPanel(nes),"Joystick")
     cardPanel.add(new KeyboardPanel(frame,nes),"Family Keyboard")
     cardPanel.add(new FDSPanel(nes),"FDS")
+    cardPanel.add(new VideoPanel(nes),"Video")
+    cardPanel.add(new GeneralPanel(nes),"Model")
 
-    cardPanel.getLayout.asInstanceOf[CardLayout].show(cardPanel,"Joystick")
+    cardPanel.getLayout.asInstanceOf[CardLayout].show(cardPanel,"Model")
   }
 
   override def valueChanged(e: TreeSelectionEvent): Unit = {

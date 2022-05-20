@@ -13,7 +13,13 @@ object Cheat:
   case class CheatDBEntry(game:String,codes:List[CheatDBEntryEffect])
   case class CheatDBEntryEffect(codes:List[String],effect:String)
 
-  case class Cheat(address:Int,data:Int,compare:Option[Int]):
+  trait CheatManager:
+    def addCheat(cheat:Cheat): Unit
+    def removeCheat(cheat:Cheat): Unit
+    def removeAllCheats(): Unit
+    def getCheats(): List[Cheat]
+
+  case class Cheat(address:Int,data:Int,compare:Option[Int],code:String):
     override def toString: String =
       compare match
         case Some(c) =>
@@ -99,4 +105,4 @@ object Cheat:
           bit(hex(6),3)  << 7
         )
 
-    Some(Cheat(address,data,compare))
+    Some(Cheat(address,data,compare,code))

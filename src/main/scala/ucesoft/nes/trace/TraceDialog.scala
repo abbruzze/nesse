@@ -232,9 +232,7 @@ class TraceDialog private (title:String,
       case _ =>
     }
   }
-  private def assembler : Unit = {
-    //ucesoft.cbm.cpu.asm.Assembler.getAssemblerDialog(displayFrame,mem,this).setVisible(true)
-  }
+
   private def showRaster(show:Boolean) : Unit = {
     display.get.setRasterLineAt(rasterLineSpinner.getValue.asInstanceOf[Int])
     display.get.setDrawRasterLine(show)
@@ -330,9 +328,6 @@ class TraceDialog private (title:String,
   val disa = new JButton("Dasm")
   disa.setToolTipText("Disassemble the given address range <a1> <a2>")
   disa.addActionListener( _ => checkAction(disass) )
-  val asm = new JButton("Asm")
-  asm.setToolTipText("Open the assembler")
-  asm.addActionListener( _ => assembler )
   val clear = new JButton("Clear")
   clear.setToolTipText("Clear debug area")
   clear.addActionListener( _ => logPanel.clear )
@@ -349,7 +344,6 @@ class TraceDialog private (title:String,
   buttonPanel.add(notrace)
   buttonPanel.add(traceFile)
   buttonPanel.add(disa)
-  buttonPanel.add(asm)
   buttonPanel.add(clear)
   buttonPanel.setBorder(BorderFactory.createTitledBorder("Actions"))
   logPanel.setBorder(BorderFactory.createTitledBorder("Messages"))

@@ -1,5 +1,7 @@
 package ucesoft.nes
 
+import ucesoft.nes.util.CartDB
+
 import java.awt.{BorderLayout, Desktop, FlowLayout}
 import javax.swing.{ImageIcon, JButton, JDialog, JEditorPane, JFrame, JLabel, JPanel}
 import javax.swing.event.HyperlinkEvent
@@ -34,8 +36,10 @@ class AboutPanel(closeAction:() => Unit) extends JPanel {
                       |built on ${Version.BUILD_DATE}<br>
                       |java version ${scala.util.Properties.javaVersion}<br>
                       |scala version ${Version.SCALA_VERSION}<br>
-                      |by Alessandro Abbruzzetti 2021<br>
+                      |by Alessandro Abbruzzetti<br>
                       |visit <a href=https://github.com/abbruzze/nesse>https://github.com/abbruzze/nesse</a>
+                      |<br><br>
+                      |Game database: ${CartDB.gameDB.size} titles, ${"%3.2f%%".format(CartDB.coverage)} coverage
                       |</html>""".stripMargin)
 
     south.add(editor)
