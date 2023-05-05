@@ -309,13 +309,17 @@ abstract class Cartridge(protected val ppu : PPU,val ines:Cartridge.iNES,protect
       case _ =>
 
   override final def read(address: Int, chipID: ChipID): Int = chipID match
-    case ChipID.CPU => readCPU(address)
+    case ChipID.CPU =>
+      openbus = readCPU(address)
+      openbus
     case ChipID.PPU => readPPU(address)
     case ChipID.PPU_RO => readPPU(address,true)
 
 
   override final def write(address: Int, value: Int, chipID: ChipID): Unit = chipID match
-    case ChipID.CPU => writeCPU(address,value)
+    case ChipID.CPU =>
+      writeCPU(address,value)
+      openbus = value
     case ChipID.PPU => writePPU(address,value)
   
   def ppuAddressOnBus(addressOnBus:Int) : Unit = {}
@@ -411,18 +415,14 @@ abstract class Cartridge(protected val ppu : PPU,val ines:Cartridge.iNES,protect
     if SRAM != null && sramEnabled then SRAM(address & 0x1FFF) else openbus
 
   protected def readCPU(address:Int) : Int =
-    openbus =
     if address < 0x6000 then address >> 8 // TODO Expansion ROM
     else
     if address < 0x8000 then
       readRAM(address)
     else
       readPRG(address)
-      
-    openbus  
 
   protected def writeCPU(address:Int,value:Int) : Unit =
-    openbus = value
     if address >= 0x6000 && address < 0x8000 then
       if SRAM != null && sramEnabled && !sramReadOnly then SRAM(address - 0x6000) = value
 

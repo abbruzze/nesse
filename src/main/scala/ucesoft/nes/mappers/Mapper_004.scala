@@ -12,7 +12,7 @@ class Mapper_004(ppu : PPU,ines:Cartridge.iNES,irqHandler: Boolean => Unit) exte
   private[this] final val SECOND_LAST_ROM = (ROM.length - 1) << 1
   private[this] final val LAST_ROM = ((ROM.length - 1) << 1) + 1
 
-  private[this] val R = Array.ofDim[Int](8)
+  private[this] val R = Array(0,2,4,5,6,7,0,0)
   private[this] var selectedR = 0
   private[this] var prgRomBankMode = 0
   private[this] var chrA12Inversion = 0
@@ -24,7 +24,7 @@ class Mapper_004(ppu : PPU,ines:Cartridge.iNES,irqHandler: Boolean => Unit) exte
   private[this] var irqPendingCounter = 0
 
   override def reset: Unit =
-    java.util.Arrays.fill(R,0)
+    System.arraycopy(Array(0,2,4,5,6,7,0,0),0,R,0,8)
     selectedR = 0
     prgRomBankMode = 0
     chrA12Inversion = 0

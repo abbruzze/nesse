@@ -17,7 +17,7 @@ class Mapper_069(ppu : PPU,ines:Cartridge.iNES,irqHandler: Boolean => Unit) exte
     if ramSelected then
       super.readRAM(address)
     else
-      readCHR_1K(address,romRamBank)
+      readPRG_8K(address,romRamBank)
 
   override def readCHR(address: Int): Int =
     readCHR_1K(address,chrBank(address >> 10))
@@ -66,8 +66,8 @@ class Mapper_069(ppu : PPU,ines:Cartridge.iNES,irqHandler: Boolean => Unit) exte
         irqCounter = (irqCounter & 0x00FF) | (value << 8)
 
   override def cpuClock(): Unit =
-    if irqEnabled && irqCounterEnabled then
+    if irqCounterEnabled then
       irqCounter = (irqCounter - 1) & 0xFFFF
-      if irqCounter == 0xFFFF then
+      if irqCounter == 0xFFFF && irqEnabled then
         irqHandler(true)
 

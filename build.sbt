@@ -1,9 +1,9 @@
 
 name := "NESSE"
 
-version := "1.0"
+version := "1.1"
 
-scalaVersion := "3.1.2"
+scalaVersion := "3.2.2"
 
 scalacOptions ++= Seq(
   "-language:postfixOps",
@@ -11,11 +11,11 @@ scalacOptions ++= Seq(
   "-deprecation"
 )
 
-libraryDependencies += "com.formdev" % "flatlaf" % "1.6.4"
-libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "3.1.3"
+libraryDependencies += "com.formdev" % "flatlaf" % "3.0"
+libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "3.3.1"
 libraryDependencies += "com.jgoodies" % "jgoodies-forms" % "1.9.0"
 libraryDependencies += "net.java.jinput" % "jinput" % "2.0.9"
-libraryDependencies += "org.yaml" % "snakeyaml" % "1.30"
+libraryDependencies += "org.yaml" % "snakeyaml" % "2.0"
 
 enablePlugins(JavaAppPackaging)
 

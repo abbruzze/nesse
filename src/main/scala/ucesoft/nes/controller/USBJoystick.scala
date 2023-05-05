@@ -25,12 +25,31 @@ object USBJoystick:
 
   def getControllerNames() : List[String] =
     System.setProperty("jinput.loglevel","SEVERE")
-    val controllers = ControllerEnvironment.getDefaultEnvironment.getControllers
+    val controllers = getControllers()
     controllers filter { c => c.getType == Controller.Type.GAMEPAD || c.getType == Controller.Type.STICK } map { _.getName.trim } toList
 
   def waitForButton(controllerName:String,action: String => Unit): Option[WaitButtonTask] =
     ControllerEnvironment.getDefaultEnvironment.getControllers.find(_.getName.trim == controllerName.trim).map(c => WaitButtonTask(c,action))
 
+  private[this] var controllers: Array[Controller] = null
+
+  private def discoverControllers(): Unit = {
+    controllers = Array()
+    val thread = new Thread {
+      override def run(): Unit = {
+        System.setProperty("jinput.loglevel", "SEVERE")
+        controllers = ControllerEnvironment.getDefaultEnvironment.getControllers
+        Log.info(s"JInput controllers discovery terminated [${controllers.length}]")
+      }
+    }
+    thread.start()
+    thread.join(1000)
+  }
+
+  def getControllers(): Array[Controller] =
+    if (controllers == null)
+      discoverControllers()
+    controllers
 
 class USBJoystick(port:Int) extends Joystick(port) with Runnable:
   override val name = s"USB Joystick #$port"
@@ -46,6 +65,7 @@ class USBJoystick(port:Int) extends Joystick(port) with Runnable:
   private[this] var running = false
 
   thread.start()
+  USBJoystick.discoverControllers()
 
   override def setSettings(set: ControllerSettings): Unit =
     set match
@@ -57,7 +77,7 @@ class USBJoystick(port:Int) extends Joystick(port) with Runnable:
 
   private def findController() : Unit = {
     System.setProperty("jinput.loglevel","SEVERE")
-    val controllers = ControllerEnvironment.getDefaultEnvironment.getControllers
+    val controllers = USBJoystick.getControllers() //ControllerEnvironment.getDefaultEnvironment.getControllers
     controller = controllers find { c => c.getName.trim() == settings.deviceName && (c.getType == Controller.Type.GAMEPAD || c.getType == Controller.Type.STICK) }
     controller match {
       case None =>

@@ -4,7 +4,7 @@ import ucesoft.nes.{Cartridge, PPU}
 import fds.{Mapper_FDS, FDS }
 
 object MapperFactory:
-  val mappers = Set(0,1,2,3,4,5,7,9,10,11,13,16,18,19,20,21,22,23,25,30,33,48,65,66,68,69,71,79,87,99,107,152,185,206,210)
+  val mappers = Set(0,1,2,3,4,5,7,9,10,11,13,16,18,19,20,21,22,23,25,30,33,48,65,66,68,69,71,73,79,80,87,99,107,152,185,206,210)
   class ChangeMapperIDException(val mapperID:Int) extends Exception
 
   def mapperFrom(ines:Cartridge.iNES,irqHandler: Boolean => Unit,ppu : PPU) : Cartridge =
@@ -42,7 +42,9 @@ object MapperFactory:
           case 68 => Mapper_068(ppu,ines,irqHandler)
           case 69 => Mapper_069(ppu,ines,irqHandler)
           case 71 => Mapper_071(ppu,ines,irqHandler)
+          case 73 => Mapper_073(ppu,ines,irqHandler)
           case 79 => Mapper_079(ppu,ines,irqHandler)
+          case 80 => Mapper_080(ppu,ines,irqHandler)
           case 87 => Mapper_087(ppu,ines,irqHandler)
           case 99 => Mapper_099(ppu,ines,irqHandler)
           case 107 => Mapper_107(ppu,ines,irqHandler)

@@ -10,6 +10,7 @@ object Preferences {
   val CHEATS = "cheats"
   val PAUSE_IF_LOST_FOCUS = "pause-if-lost-focus"
   val TRACE = "trace"
+  val CPU_JAM_HALT = "cpu-jam-halt"
   // DEVICES ======================================================
   val ZAPPER_ON_PORT = "zapper-on-port"
   val KEYBOARD_ON = "keyboard"

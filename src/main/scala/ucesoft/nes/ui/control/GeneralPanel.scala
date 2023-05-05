@@ -22,6 +22,7 @@ class GeneralPanel(nes:NES) extends JPanel {
     group.add(regionNTSC)
 
     val pauseIfFocusLost = new JCheckBox("Pause emulator when focus is lost")
+    val cpuJamHandling = new JCheckBox("CPU JAM instruction blocks emulator")
 
     pref.get[String](PPU_TV_MODE).map(_.value) match {
       case None =>
@@ -35,20 +36,23 @@ class GeneralPanel(nes:NES) extends JPanel {
     }
 
     pauseIfFocusLost.setSelected(pref.get[Boolean](PAUSE_IF_LOST_FOCUS).map(_.value).getOrElse(false))
+    cpuJamHandling.setSelected(pref.get[Boolean](CPU_JAM_HALT).map(_.value).getOrElse(false))
 
     regionAuto.addActionListener(_ => nes.preferences.update[String](PPU_TV_MODE,"auto"))
     regionPAL.addActionListener(_ => nes.preferences.update[String](PPU_TV_MODE,"PAL"))
     regionNTSC.addActionListener(_ => nes.preferences.update[String](PPU_TV_MODE,"NTSC"))
     pauseIfFocusLost.addActionListener(_ => nes.preferences.update[Boolean](PAUSE_IF_LOST_FOCUS,pauseIfFocusLost.isSelected))
+    cpuJamHandling.addActionListener(_ => nes.preferences.update[Boolean](CPU_JAM_HALT,cpuJamHandling.isSelected))
 
     val panel = FormBuilder.create().
       columns("5dlu,fill:pref,5dlu").
-      rows("10dlu,pref,5dlu,pref,5dlu,pref,5dlu,pref,15dlu,pref,10dlu").
+      rows("10dlu,pref,5dlu,pref,5dlu,pref,5dlu,pref,15dlu,pref,5dlu,pref,10dlu").
       addTitle("PPU Region").xy(2,2).
       add(regionAuto).xy(2,4).
       add(regionPAL).xy(2,6).
       add(regionNTSC).xy(2,8).
       add(pauseIfFocusLost).xy(2,10).
+      add(cpuJamHandling).xy(2,12).
       build()
 
     setLayout(new BorderLayout())

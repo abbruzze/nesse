@@ -53,8 +53,13 @@ class CPU6502(private var mem: Memory, val id: ChipID) extends CPU65xx {
   private[this] var prevIClearedFlag = false
   private[this] var pageCrossed = false
   private[this] var readyCycles = 0
+  
+  private[this] var cpuJAMHalts = false
 
   // -----------------------------------------
+  
+  def setCPUJAMHalts(halt:Boolean): Unit = cpuJAMHalts = halt
+  
   final override def setDMA(dma: Boolean) : Unit = {
     // when dma is set from REU, both RDY & AEC are asserted, so if the cpu tries to write on the bus, the writing has no effect
     this.dma = dma
@@ -1661,13 +1666,15 @@ class CPU6502(private var mem: Memory, val id: ChipID) extends CPU65xx {
         case O_BRK4 => () => {
           if (ready) {
             irqFirstCycle += 1
-            PC = mem.read(if (!nmiOnNegativeEdge) 0xfffe else 0xfffa)
+            //PC = mem.read(if (!nmiOnNegativeEdge) 0xfffe else 0xfffa)
+            PC = mem.read(0xfffe)
             state = O_BRK5
           }
         }
         case O_BRK5 => () => {
           if (ready) {
-            data = mem.read(if (!nmiOnNegativeEdge) 0xffff else 0xfffb)
+            //data = mem.read(if (!nmiOnNegativeEdge) 0xffff else 0xfffb)
+            data = mem.read(0xffff)
             if (nmiOnNegativeEdge) nmiOnNegativeEdge = false
             PC |= data << 8
             Last
@@ -2128,7 +2135,7 @@ class CPU6502(private var mem: Memory, val id: ChipID) extends CPU65xx {
     }
 
     // check interrupts
-    if (nmiOnNegativeEdge && state == 0 && clk.currentCycles - nmiFirstCycle >= 2) {
+    if (nmiOnNegativeEdge && (state == 0 || (!cpuJAMHalts && state == O_JAM)) && clk.currentCycles - nmiFirstCycle >= 2) {
       nmiOnNegativeEdge = false
       state = NMI_STATE
       if (breakType != null && breakType.isBreak(PC, false, true)) {
@@ -2137,7 +2144,7 @@ class CPU6502(private var mem: Memory, val id: ChipID) extends CPU65xx {
         Log.debug("NMI Break")
       }
     }
-    else if (state == 0 && ((irqLow && (!isInterrupt || prevIClearedFlag)  && clk.currentCycles - irqFirstCycle >= 2) || forceIRQNow)) {
+    else if ((state == 0 || (!cpuJAMHalts && state == O_JAM)) && ((irqLow && (!isInterrupt || prevIClearedFlag)  && clk.currentCycles - irqFirstCycle >= 2) || forceIRQNow)) {
       if (!delay1CycleIRQCheck) {
         forceIRQNow = false
         state = IRQ_STATE

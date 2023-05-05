@@ -78,6 +78,8 @@ class NESUI extends SwingAware with VideoControl:
   protected var forceZapperOnPort: Option[Int] = None
   protected var forceKeyboard = false
   protected var paused = false
+  
+  protected var cpuJAMHalts = false
 
   protected def closeFrameListener(id:String): Unit =
     frameListeners -= id
@@ -157,7 +159,7 @@ class NESUI extends SwingAware with VideoControl:
 
   protected def errorHandler(t:Throwable) : Unit =
     t match
-      case j:CPUJammedException =>
+      case j:CPUJammedException if cpuJAMHalts =>
         JOptionPane.showConfirmDialog(frame,
           s"CPU[${j.cpuID}] jammed at " + Integer.toHexString(j.pcError) + ". Do you want to open debugger (yes), reset (no) or continue (cancel) ?",
           "CPU jammed",
@@ -172,6 +174,7 @@ class NESUI extends SwingAware with VideoControl:
           case _ =>
             reset(true)
         }
+      case _:CPUJammedException =>
       case _ =>
         Log.info("Fatal error occurred: " + nes.cpu + "-" + t)
         try Log.info(nes.cpu.disassemble(nes.cpuMem,nes.cpu.getCurrentInstructionPC)._1) catch { case _:Throwable => }
@@ -215,6 +218,11 @@ class NESUI extends SwingAware with VideoControl:
       if trace then
         traceDialog.forceTracing(true)
         traceDialog.setVisible(true)
+    }
+
+    pref.add(CPU_JAM_HALT, "cpu's jam instruction halts emulator", false) { halt =>
+      cpuJAMHalts = halt
+      nes.cpu.setCPUJAMHalts(cpuJAMHalts)
     }
 
     // Joystick
