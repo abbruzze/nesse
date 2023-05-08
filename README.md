@@ -9,6 +9,15 @@
 
 Nesse a Scala 3 NES emulator
 ====
+
+### What's new 1.1 (May 8th 2023)
+- Added mapper 73 and 80. Fixed 4 and 69.
+- Fixed USB joystick to avoid emulator freezing.
+- Added general option to choose what to do with CPU jam.
+
+Examples
+====
+
 <p align="center">
   <img src="https://github.com/abbruzze/nesse/blob/main/images/supermario.png">
   <img src="https://github.com/abbruzze/nesse/blob/main/images/castelvania_III.png">
@@ -31,7 +40,7 @@ Nesse a Scala 3 NES emulator
 - Game Genie DB
 - Controllers: keyboard, USB joystick
 - Mappers
-  - 0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 16, 18, 19, 20, 21, 22, 23, 25, 30, 33, 48, 65, 66, 68, 69, 71, 79, 87, 99, 107, 152, 185, 206, 210
+  - 0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 16, 18, 19, 20, 21, 22, 23, 25, 30, 33, 48, 65, 66, 68, 69, 71, 73, 79, 80, 87, 99, 107, 152, 185, 206, 210
 - Debugger
 
 ### Download
